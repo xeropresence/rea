@@ -1,15 +1,24 @@
 import { satisfies } from "semver";
 
-/** Supported runtime range, kept in sync with the published package engines. */
+/**
+ * Supported Node.js releases, kept in sync with the published package engines.
+ * The patch floors are Node.js security releases.
+ */
 export const SUPPORTED_NODE_VERSION_RANGE = "^22.23.4 || ^24.22.1 || >=26.12.1";
 
 /** Human-readable form of {@link SUPPORTED_NODE_VERSION_RANGE} for remediation. */
 export const SUPPORTED_NODE_VERSION_PROSE =
   "Node.js 22.x (>=22.23.4), 24.x (>=24.22.1), or 26.12.1+";
 
-/** Return whether a Node.js version satisfies REA's tested runtime families. */
-export const supportsNodeVersion = (version: string): boolean =>
-  satisfies(version, SUPPORTED_NODE_VERSION_RANGE);
+/**
+ * Node.js API families a Bun runtime must declare compatibility with. Bun
+ * implements these APIs itself instead of shipping Node.js, so Node.js
+ * security patch floors do not describe a Bun release.
+ */
+const BUN_NODE_COMPATIBILITY_RANGE = "^22.19.0 || ^24.11.0 || >=26.0.0";
+
+const BUN_NODE_COMPATIBILITY_PROSE =
+  "Node.js 22.x (>=22.19.0), 24.x (>=24.11.0), or 26.0.0+";
 
 /** JavaScript runtime executing REA. Bun also reports a Node.js compatibility version. */
 export type JavaScriptRuntime =
@@ -33,10 +42,25 @@ export const javaScriptRuntime = (versions: {
         nodeCompatibilityVersion: versions.node,
       };
 
-/** Bun is supported when its reported Node.js compatibility version is. */
+/**
+ * Range a runtime is judged against: Node.js by its own version, Bun by the
+ * Node.js compatibility version it declares.
+ */
+export const supportedRuntimeRange = (runtime: JavaScriptRuntime): string =>
+  runtime.id === "node"
+    ? SUPPORTED_NODE_VERSION_RANGE
+    : BUN_NODE_COMPATIBILITY_RANGE;
+
 export const supportsJavaScriptRuntime = (
   runtime: JavaScriptRuntime,
 ): boolean =>
-  supportsNodeVersion(
+  satisfies(
     runtime.id === "node" ? runtime.version : runtime.nodeCompatibilityVersion,
+    supportedRuntimeRange(runtime),
   );
+
+/** Recovery for an unsupported runtime; installing Node.js does not change the runtime Bun runs. */
+export const unsupportedRuntimeAction = (runtime: JavaScriptRuntime): string =>
+  runtime.id === "node"
+    ? `Install ${SUPPORTED_NODE_VERSION_PROSE}`
+    : `Upgrade Bun to a release that declares ${BUN_NODE_COMPATIBILITY_PROSE} compatibility`;

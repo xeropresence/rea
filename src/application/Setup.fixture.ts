@@ -9,6 +9,7 @@ import type {
 import type { SetupClient } from "./SupportedClients.js";
 import type { SetupHopperInstallResult } from "./SetupInstallFailure.js";
 import { err, ok, type Result } from "../domain/result.js";
+import type { JavaScriptRuntime } from "../domain/runtimeVersion.js";
 import type {
   DoctorCheck,
   DoctorProviderInspection,
@@ -31,7 +32,7 @@ export class FakeSetupHost implements SetupHost {
   }
   registrationCommand: readonly string[];
   registrationCommandBlocker?: string;
-  nodeVersion = "24.22.1";
+  runtime: JavaScriptRuntime = { id: "node", version: "24.22.1" };
   version: string | undefined = "14.5";
   distribution: LinuxDistribution | undefined;
   hopper: string | undefined;

@@ -126,7 +126,7 @@ describe("setup skill backup cleanup ownership", () => {
           { approved: true, installHopper: false, structured: true },
           {
             ...host,
-            nodeVersion: "24.22.1",
+            runtime: { id: "node", version: "24.22.1" },
             initialSetupState: async () => {
               throw primary;
             },

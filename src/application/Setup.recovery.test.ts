@@ -17,7 +17,7 @@ import { ProviderCleanupError } from "../domain/providerCleanupError.js";
 describe("setup workflow", () => {
   it("rejects Node 25 before applying setup actions", async () => {
     const host = new FakeSetupHost();
-    host.nodeVersion = "25.1.0";
+    host.runtime = { id: "node", version: "25.1.0" };
     host.clients = [{ name: "codex", configPath: "/codex.toml" }];
 
     const result = await runSetup(
@@ -377,7 +377,8 @@ describe("setup returned result cleanup", () => {
         selected.hopper = "/Applications/Hopper";
         selected.doctorHealthy = state === "ready";
         selected.scopedDoctorHealthy = state === "ready";
-        if (state === "needs_human") selected.nodeVersion = "25.0.0";
+        if (state === "needs_human")
+          selected.runtime = { id: "node", version: "25.0.0" };
       }
       const input = {
         ...options(true),
@@ -427,9 +428,29 @@ describe("setup scoped readiness", () => {
     expect(platformHost.configurations).toBe(1);
 
     const nodeHost = new FakeSetupHost();
-    nodeHost.nodeVersion = "20.0.0";
+    nodeHost.runtime = { id: "node", version: "20.0.0" };
     expect((await runSetup(options(true), nodeHost)).remediation).toBe(
       `Install ${SUPPORTED_NODE_VERSION_PROSE} and rerun setup.`,
+    );
+
+    // Bun 1.4 declares Node.js 26.3.0, below the Node.js 26 security floor;
+    // that floor does not apply to Bun's own implementation.
+    const bunHost = new FakeSetupHost();
+    bunHost.runtime = {
+      id: "bun",
+      version: "1.4.4",
+      nodeCompatibilityVersion: "26.3.0",
+    };
+    expect((await runSetup(options(true), bunHost)).status).toBe("ready");
+
+    const oldBunHost = new FakeSetupHost();
+    oldBunHost.runtime = {
+      id: "bun",
+      version: "1.3.0",
+      nodeCompatibilityVersion: "24.3.0",
+    };
+    expect((await runSetup(options(true), oldBunHost)).remediation).toBe(
+      "Upgrade Bun to a release that declares Node.js 22.x (>=22.19.0), 24.x (>=24.11.0), or 26.0.0+ compatibility and rerun setup.",
     );
 
     const macHost = new FakeSetupHost();

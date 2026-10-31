@@ -11,8 +11,8 @@ import { ConfigurationError } from "../domain/configurationErrors.js";
 import { PRODUCT_IDENTITY } from "../identity.js";
 import { currentClientRegistrationCommand } from "./ClientRegistrationIdentity.js";
 import {
-  SUPPORTED_NODE_VERSION_PROSE,
-  supportsNodeVersion,
+  supportsJavaScriptRuntime,
+  unsupportedRuntimeAction,
 } from "../domain/runtimeVersion.js";
 import {
   runDoctor,
@@ -114,11 +114,11 @@ export const filterClientsNeedingConfigure = async (
   return detectedClients.filter((_, index) => needs[index]);
 };
 
-/** Refuse a Node.js runtime REA does not support before any setup work. */
+/** Refuse a JavaScript runtime REA does not support before any setup work. */
 export const hostRemediation = (host: SetupHost): string | undefined =>
-  supportsNodeVersion(host.nodeVersion)
+  supportsJavaScriptRuntime(host.runtime)
     ? undefined
-    : `Install ${SUPPORTED_NODE_VERSION_PROSE} and rerun setup.`;
+    : `${unsupportedRuntimeAction(host.runtime)} and rerun setup.`;
 
 /** Production setup effects for Hopper, agent configuration, and the canonical skill directory. */
 export const systemSetupHost = (
@@ -176,7 +176,7 @@ export const systemSetupHost = (
     skillDestinations: (clientIds) =>
       skillDestinations(homeDirectory, clientIds, environment, platform),
     ...registration,
-    nodeVersion: process.versions.node,
+    runtime: doctorHost.runtime,
     macosVersion: () => doctorHost.macosVersion(),
     linuxDistribution,
     close: () => cleanup.close(),

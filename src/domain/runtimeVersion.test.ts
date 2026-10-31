@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import {
   javaScriptRuntime,
   supportsJavaScriptRuntime,
-  supportsNodeVersion,
 } from "./runtimeVersion.js";
 
 describe("supported Node.js versions", () => {
@@ -30,7 +29,7 @@ describe("supported Node.js versions", () => {
     ["24.22.invalid", false],
     ["invalid", false],
   ])("classifies %s as supported=%s", (version, expected) => {
-    expect(supportsNodeVersion(version)).toBe(expected);
+    expect(supportsJavaScriptRuntime({ id: "node", version })).toBe(expected);
   });
 });
 
@@ -48,17 +47,21 @@ describe("JavaScript runtime identity", () => {
   });
 });
 
-describe("supported JavaScript runtimes", () => {
+describe("supported Bun runtimes", () => {
   it.each([
-    [{ id: "node", version: "24.22.1" }, true],
-    [{ id: "node", version: "24.18.0" }, false],
-    // Bun is judged by its Node.js compatibility version, not its own.
+    // Bun is judged by its declared Node.js API compatibility, not its own
+    // version, and Node.js security patch floors do not apply to it.
+    [{ id: "bun", version: "1.4.4", nodeCompatibilityVersion: "26.3.0" }, true],
     [
-      { id: "bun", version: "1.4.2", nodeCompatibilityVersion: "26.12.1" },
+      { id: "bun", version: "1.4.4", nodeCompatibilityVersion: "24.11.0" },
       true,
     ],
     [
-      { id: "bun", version: "99.0.0", nodeCompatibilityVersion: "24.18.0" },
+      { id: "bun", version: "99.0.0", nodeCompatibilityVersion: "24.10.9" },
+      false,
+    ],
+    [
+      { id: "bun", version: "99.0.0", nodeCompatibilityVersion: "25.1.0" },
       false,
     ],
   ] as const)("classifies %o as supported=%s", (runtime, expected) => {

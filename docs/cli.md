@@ -1077,15 +1077,15 @@ rea --version --json
 }
 ```
 
-| Field                                | Meaning                                                                                                        |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `name`, `version`                    | Published package name and version; `version` matches plain `--version`.                                       |
-| `runtime.id`                         | `node` or `bun`.                                                                                               |
-| `runtime.version`                    | Version of that runtime.                                                                                       |
-| `runtime.node_compatibility_version` | Bun only: the Node.js version it reports compatibility with.                                                   |
-| `platform`, `architecture`           | Node.js `process.platform` and `process.arch`, such as `linux` and `x64`.                                      |
-| `supported_runtime.range`            | Supported Node.js range.                                                                                       |
-| `supported_runtime.satisfied`        | Whether this runtime is supported, judged as `rea doctor` judges it; Bun by its Node.js compatibility version. |
+| Field                                | Meaning                                                                                                                  |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `name`, `version`                    | Published package name and version; `version` matches plain `--version`.                                                 |
+| `runtime.id`                         | `node` or `bun`.                                                                                                         |
+| `runtime.version`                    | Version of that runtime.                                                                                                 |
+| `runtime.node_compatibility_version` | Bun only: the Node.js version it reports compatibility with.                                                             |
+| `platform`, `architecture`           | Node.js `process.platform` and `process.arch`, such as `linux` and `x64`.                                                |
+| `supported_runtime.range`            | Range `satisfied` is judged against: the supported Node.js range, or under Bun the declared Node.js compatibility range. |
+| `supported_runtime.satisfied`        | Whether this runtime is supported, judged as `rea doctor` judges it; Bun by its Node.js compatibility version.           |
 
 The field names are stable. The report contains no paths, environment values,
 user or host names, and it starts no provider and reads no target. `--format`

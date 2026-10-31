@@ -8,7 +8,7 @@ import {
   registryPackageSource,
 } from "../../../src/application/environment/environmentBundle.js";
 import { PRODUCT_IDENTITY } from "../../../src/identity.js";
-import { supportsNodeVersion } from "../../../src/domain/runtimeVersion.js";
+import { supportsJavaScriptRuntime } from "../../../src/domain/runtimeVersion.js";
 
 /**
  * The exported Dockerfile installs the CLI that produced the bundle, so the
@@ -25,7 +25,9 @@ describe("environment bundle package pin", () => {
       dockerfile.split("\n")[0] ?? "",
     )?.[1];
     expect(nodeVersion).toBe(pinned);
-    expect(supportsNodeVersion(nodeVersion ?? "")).toBe(true);
+    expect(
+      supportsJavaScriptRuntime({ id: "node", version: nodeVersion ?? "" }),
+    ).toBe(true);
   });
 
   it("pins the registry install to the package.json version", async () => {

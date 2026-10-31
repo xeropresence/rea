@@ -27,19 +27,22 @@ describe("version report", () => {
     });
   });
 
-  it("judges Bun by its Node.js compatibility version", () => {
+  it("reports the Node.js compatibility range Bun is judged against", () => {
     const report = versionReport({
       ...host,
-      versions: { node: "24.18.0", bun: "1.4.2" },
+      versions: { node: "26.3.0", bun: "1.4.4" },
     });
 
     expect(versionReportSchema.parse(report)).toMatchObject({
       runtime: {
         id: "bun",
-        version: "1.4.2",
-        node_compatibility_version: "24.18.0",
+        version: "1.4.4",
+        node_compatibility_version: "26.3.0",
       },
-      supported_runtime: { satisfied: false },
+      supported_runtime: {
+        range: "^22.19.0 || ^24.11.0 || >=26.0.0",
+        satisfied: true,
+      },
     });
   });
 

@@ -462,8 +462,10 @@ describe("doctor runtime check", () => {
   });
 
   it.each([
-    { compatibility: "26.12.1", ok: true },
-    { compatibility: "26.12.0", ok: false },
+    // Bun 1.4 declares 26.3.0; Node.js security floors do not apply to Bun.
+    { compatibility: "26.3.0", ok: true },
+    { compatibility: "24.11.0", ok: true },
+    { compatibility: "24.3.0", ok: false },
     { compatibility: "25.1.0", ok: false },
   ])(
     "identifies Bun and admits it by Node.js compatibility $compatibility",
@@ -489,6 +491,12 @@ describe("doctor runtime check", () => {
             version: "1.4.2",
             node_compatibility_version: compatibility,
           },
+          ...(ok
+            ? {}
+            : {
+                remediation:
+                  "Upgrade Bun to a release that declares Node.js 22.x (>=22.19.0), 24.x (>=24.11.0), or 26.0.0+ compatibility.",
+              }),
         }),
       );
     },

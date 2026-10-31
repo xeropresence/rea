@@ -8,6 +8,7 @@ import type {
   SetupSkillInstallError,
 } from "./SetupSkill.js";
 import type { Result } from "../domain/result.js";
+import type { JavaScriptRuntime } from "../domain/runtimeVersion.js";
 import type {
   AnalysisCleanupObservation,
   AnalysisError,
@@ -110,7 +111,7 @@ export interface SetupHost {
   readonly registrationCommand: readonly string[];
   /** Why client registration cannot proceed from this host. */
   readonly registrationCommandBlocker?: string;
-  readonly nodeVersion: string;
+  readonly runtime: JavaScriptRuntime;
   macosVersion(): Promise<string | undefined>;
   linuxDistribution(): Promise<LinuxDistribution | undefined>;
   initialSetupState(scope?: DoctorScope): Promise<SetupInitialState>;

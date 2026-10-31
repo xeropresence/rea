@@ -1761,8 +1761,11 @@ absolute runtime and script paths, without a package-runner command shim.
 REA supports Node.js 22.x (>=22.23.4), 24.x (>=24.22.1), and 26.12.1+. Node.js 23, 25, earlier 26.x releases, and prereleases are unsupported. It uses the npm already paired with that runtime and never upgrades Node.js, npm, or Homebrew.
 
 When REA runs on Bun, the `rea doctor` `node` check reports the Bun version and
-the Node.js compatibility version Bun declares, and passes when that
-compatibility version is in the supported range. Bun does not enforce the V8
+the Node.js compatibility version Bun declares. `rea doctor` and `rea setup`
+support Bun when that declared version is Node.js 22.x (>=22.19.0), 24.x
+(>=24.11.0), or 26.0.0+. The Node.js security patch floors above do not apply,
+because Bun ships its own implementation rather than Node.js; an older Bun is
+refused with an instruction to upgrade Bun, not to install Node.js. Bun does not enforce the V8
 heap flags REA gives its owned helper processes, so Evidence that reports those
 limits on Node.js records them as unavailable under Bun. On Windows, the owned
 Job Object of each JavaScript helper (source analyzer, source-map codec and HAR

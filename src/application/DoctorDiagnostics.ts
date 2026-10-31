@@ -1,6 +1,6 @@
 import {
-  SUPPORTED_NODE_VERSION_PROSE,
   supportsJavaScriptRuntime,
+  unsupportedRuntimeAction,
 } from "../domain/runtimeVersion.js";
 import { hopperLauncherDiscovery } from "./HopperLauncherDiscovery.js";
 import { macosMajorVersion } from "../domain/macosVersion.js";
@@ -94,10 +94,10 @@ export const doctorHealthy = (
   );
 };
 
-/** Runtime support follows the shared rule, which judges Bun by its Node.js compatibility. */
+/** Runtime support follows the shared rule, which judges Bun by its declared Node.js compatibility. */
 const nodeCheck = ({ runtime }: DoctorHost): DoctorCheck => {
   const failure = {
-    remediation: `Install ${SUPPORTED_NODE_VERSION_PROSE}.`,
+    remediation: `${unsupportedRuntimeAction(runtime)}.`,
     classification: "missing_dependency",
   } as const;
   if (runtime.id === "node")
